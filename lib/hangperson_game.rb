@@ -5,12 +5,48 @@ class HangpersonGame
 
   # Get a word from remote "random word" service
 
-  # def initialize()
-  # end
+  attr_accessor :word, :wrong_guesses, :guesses
   
   def initialize(word)
-    @word = word
+    @word = word.downcase
+    @guesses = ""
+    @wrong_guesses = ""
   end
+
+  def guess(letter)
+    raise ArgumentError.new('no empty') if letter.to_s.empty?
+    raise ArgumentError.new('letters only') if letter =~ /\W/
+    ld = letter.downcase
+    if @guesses.include? ld or @wrong_guesses.include? ld
+      false
+    else               # do not pass to guesses method, check here instead
+      if @word.include? ld
+        @guesses += ld
+      else
+        @wrong_guesses += ld
+      end
+      true
+    end
+  end
+
+
+  def check_win_or_lose
+    if @wrong_guesses.length < 7 
+      if self.word_with_guesses.include? '-'
+        @check_win_or_lose = :play # 'play' , use symbol, not string
+      else
+        @check_win_or_lose = :win
+      end
+    else 
+      @check_win_or_lose = :lose
+    end    
+  end
+
+  def word_with_guesses
+    @word.gsub(/[^ #{@guesses}]/, '-')
+  end
+
+
 
   # You can test it by running $ bundle exec irb -I. -r app.rb
   # And then in the irb: irb(main):001:0> HangpersonGame.get_random_word
@@ -25,3 +61,13 @@ class HangpersonGame
   end
 
 end
+
+
+#g = HangpersonGame.new('glorp')
+#g.guess('a')
+#g.guess('a')
+#g.guess('a')
+#g.guesses
+#g.wrong_guesses
+#g.word
+#puts '<end>'
